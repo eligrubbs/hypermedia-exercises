@@ -36,9 +36,12 @@
         </fieldset>
     </form>
 
-    <button id="delete-btn">
+    <form action="/contacts/{{ contact.id }}/delete" method="post">
+        <button id="delete-btn">Delete Contact</button>
+    </form>
+    <!-- <button id="delete-btn">
         Delete Contact
-    </button>
+    </button> -->
 
     <p>
         <a href="/contacts">Back</a>
