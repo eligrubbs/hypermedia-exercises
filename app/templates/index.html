@@ -2,12 +2,20 @@
 
 {% block content %}
 
-    <form action="/contacts" method="get" class="tool-bar">
+    <!-- <form action="/contacts" method="get" class="tool-bar">
         <label for="search">Search Term</label>
         <input id="search" type="search" name="q" value="{{ request.query_params.get('q') or '' }}"/>
         <img style="height: 20px" id="spinner" class="htmx-indicator" src="/static/img/spinning-circles.svg"/>
         <input type="submit" value="Search"/>
-    </form>
+    </form> -->
+
+    <div id="htmxSearchOption" class="tool-bar">
+        <label for="search">Search Term</label>
+        <input type="search" name="q" id="searchQuery" placeholder="Search Contacts" value="{{ request.query_params.get('q') or '' }}">
+        <button hx-post="/contacts" hx-target="#contactTableBody" hx-include="#searchQuery" hx-swap="innerHTML">
+            Search
+        </button>
+    </div>
 
     <form>
     <table>
@@ -21,7 +29,7 @@
             <th></th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="contactTableBody">
         {% include 'components/rows.html' %}
         </tbody>
     </table>

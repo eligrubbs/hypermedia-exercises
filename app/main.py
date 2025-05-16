@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Request
+from typing import Annotated
+from fastapi import FastAPI, Request, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -26,6 +27,19 @@ async def contacts(req: Request):
         contact_set = Contact.all()
 
     return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set})
+
+
+# HTMX Search
+@app.post("/contacts", response_class=HTMLResponse)
+async def search_contacts(req: Request, q: Annotated[str, Form()]):
+
+    search = q
+    if search is not None:
+        contact_set = Contact.search(search)
+    else:
+        contact_set = Contact.all()
+
+    return templates.TemplateResponse(req, "components/rows.html", context={"contacts": contact_set})
 
 
 @app.get("/contacts/new", response_class=HTMLResponse)
