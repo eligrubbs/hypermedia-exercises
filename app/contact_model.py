@@ -5,6 +5,7 @@ This is a good example of how our business logic can be completely seperate from
 """
 import json, time
 from typing import Self
+from pydantic import EmailStr, BaseModel
 
 
 class Contact:
@@ -29,8 +30,16 @@ class Contact:
 
 
     def validate(self):
+        self.errors.pop('email', None)
         if not self.email:
             self.errors['email'] = "Email Required"
+        class Email(BaseModel):
+            email: EmailStr
+        try:
+            temp = Email(email=self.email)
+        except Exception as e:
+            print(e)
+            self.errors['email'] = 'Not Valid Email'
         existing_contact = next(filter(lambda c: c.id != self.id and c.email == self.email, Contact.db.values()), None)
         if existing_contact:
             self.errors['email'] = "Email Must Be Unique"

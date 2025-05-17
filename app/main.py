@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import FastAPI, Request, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
 
 from contact_model import Contact
 
@@ -88,3 +88,11 @@ async def del_contact(c_id: int):
     c = Contact.find(c_id)
     c.delete()
     return RedirectResponse("/contacts", 303)
+
+
+@app.get("/contacts/{c_id}/email", response_class=PlainTextResponse)
+async def email_validation(c_id: int, email: str):
+    c = Contact.find(c_id)
+    c.email = email
+    c.validate()
+    return c.errors.get('email', '')
