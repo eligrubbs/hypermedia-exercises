@@ -11,8 +11,9 @@
 
     <div id="htmxSearchOption" class="tool-bar">
         <label for="search">Search Term</label>
-        <input type="search" name="q" id="searchQuery" placeholder="Search Contacts" value="{{ request.query_params.get('q') or '' }}">
-        <button hx-post="/contacts" hx-target="#contactTableBody" hx-include="#searchQuery" hx-swap="innerHTML">
+        <input type="search" name="q" id="searchQuery" placeholder="Search Contacts" value="{{ search_query }}">
+        <input type="hidden" name="page" id="pageNum" value="{{ page }}">
+        <button hx-post="/contacts" hx-target="#contactTableBody" hx-include="#searchQuery, #pageNum" hx-swap="innerHTML">
             Search
         </button>
     </div>

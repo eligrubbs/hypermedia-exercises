@@ -20,12 +20,14 @@
     </tr>
 {% endfor %}
 {% if contacts|length == 10 %}
-    <tr>
+    <tr id="loadMoreRow">
         <td colspan="5" style="text-align: center">
-        <button hx-target="closest tr"
+        <input type="hidden" id="hiddenQuery" name="q" value="{{ search_query }}">
+        <input type="hidden" id="hiddenPage" name="page" value="{{ page + 1 }}">
+        <button hx-target="#loadMoreRow"
             hx-swap="outerHTML"
-            hx-select="tbody > tr"
-            hx-get="/contacts?page={{ page + 1 }}">
+            hx-include="#hiddenQuery, #hiddenPage"
+            hx-post="/contacts">
             Load More
         </button>
         </td>
