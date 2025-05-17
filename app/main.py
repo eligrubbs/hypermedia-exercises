@@ -71,6 +71,14 @@ async def make_contact_post(req: Request):
         return templates.TemplateResponse(req, "new.html", context={"contact": c})
 
 
+@app.get("/contacts/count", response_class=PlainTextResponse)
+async def contact_count():
+    # Mock taking a long time
+    import asyncio
+    await asyncio.sleep(1)
+    return f"( {Contact.all().__len__()} total Contacts )"
+
+
 @app.get("/contacts/{c_id}", response_class=HTMLResponse)
 async def show_contact(req: Request, c_id: int):
     c = Contact.find(c_id)
@@ -108,4 +116,3 @@ async def email_validation(c_id: int, email: str):
     c.email = email
     c.validate()
     return c.errors.get('email', '')
-

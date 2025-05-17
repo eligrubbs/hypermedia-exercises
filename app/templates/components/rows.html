@@ -25,7 +25,7 @@
         <input type="hidden" id="hiddenQuery" name="q" value="{{ search_query }}">
         <input type="hidden" id="hiddenPage" name="page" value="{{ page + 1 }}">
         <span hx-target="#loadMoreRow"
-            hx-trigger="revealed delay:500ms"
+            hx-trigger="revealed delay:100ms"
             hx-swap="outerHTML"
             hx-include="#hiddenQuery, #hiddenPage"
             hx-post="/contacts">

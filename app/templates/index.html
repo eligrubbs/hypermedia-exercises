@@ -11,9 +11,19 @@
 
     <div id="htmxSearchOption" class="tool-bar">
         <label for="search">Search Term</label>
-        <input type="search" name="q" id="searchQuery" placeholder="Search Contacts" value="{{ search_query }}">
+        <input type="search" name="q" id="searchQuery" placeholder="Search Contacts" value="{{ search_query }}"
+            hx-post="/contacts"
+            hx-trigger="search, keyup delay:200ms changed"
+            hx-target="#contactTableBody"
+            hx-include="#searchQuery, #pageNum"
+            hx-swap="innerHTML"
+            hx-indicator="#spinner"/>
+        <img id="spinner" style="height: 20px" class="htmx-indicator" src="/static/img/spinning-circles.svg" alt="Request In Flight..."/>
         <input type="hidden" name="page" id="pageNum" value="{{ page }}">
-        <button hx-post="/contacts" hx-target="#contactTableBody" hx-include="#searchQuery, #pageNum" hx-swap="innerHTML">
+        <button hx-post="/contacts"
+                hx-target="#contactTableBody"
+                hx-include="#searchQuery, #pageNum"
+                hx-swap="innerHTML">
             Search
         </button>
     </div>
