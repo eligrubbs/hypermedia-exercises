@@ -1,46 +1,33 @@
-<div id="paginationButton">
-    <span>
-        {% if page > 1 %}
-        <a href="/contacts?page={{ page - 1 }}&q={{ search_query }}">Previous</a>
-        {% endif %}
-        {% if contacts|length == 10 %}
-        <a href="/contacts?page={{ page + 1 }}&q={{ search_query }}">Next</a>
-        {% endif %}
-    </span>
-</div>
-
-<table>
-    <thead>
-        <tr>
-            <th></th>
-            <th>First</th>
-            <th>Last</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody id="contactTableBody">
-        {% for contact in contacts %}
-            <tr>
-                <td><input type="checkbox" name="selected_contact_ids" value="{{ contact.id }}"></td>
-                <td>{{ contact.first }}</td>
-                <td>{{ contact.last }}</td>
-                <td>{{ contact.phone }}</td>
-                <td>{{ contact.email }}</td>
-                <td>
-                    <div data-overflow-menu>
-                        <button type="button" aria-haspopup="menu"
-                            aria-controls="contact-menu-{{ contact.id }}"
-                            >Options</button>
-                        <div role="menu" hidden id="contact-menu-{{ contact.id }}">
-                            <a role="menuitem" href="/contacts/{{ contact.id }}/edit">Edit</a>
-                            <a role="menuitem" href="/contacts/{{ contact.id }}">View</a>
-                            <a role="menuitem" href="#">Delete</a>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% for contact in contacts %}
+    <tr>
+        <td><input type="checkbox" name="selected_contact_ids" value="{{ contact.id }}"></td>
+        <td>{{ contact.first }}</td>
+        <td>{{ contact.last }}</td>
+        <td>{{ contact.phone }}</td>
+        <td>{{ contact.email }}</td>
+        <td>
+            <div data-overflow-menu>
+                <button type="button" aria-haspopup="menu"
+                    aria-controls="contact-menu-{{ contact.id }}"
+                    >Options</button>
+                <div role="menu" hidden id="contact-menu-{{ contact.id }}">
+                    <a role="menuitem" href="/contacts/{{ contact.id }}/edit">Edit</a>
+                    <a role="menuitem" href="/contacts/{{ contact.id }}">View</a>
+                    <a role="menuitem" href="#">Delete</a>
+                </div>
+            </div>
+        </td>
+    </tr>
+{% endfor %}
+{% if contacts|length == 10 %}
+    <tr>
+        <td colspan="5" style="text-align: center">
+        <button hx-target="closest tr"
+            hx-swap="outerHTML"
+            hx-select="tbody > tr"
+            hx-get="/contacts?page={{ page + 1 }}">
+            Load More
+        </button>
+        </td>
+    </tr>
+{% endif %}

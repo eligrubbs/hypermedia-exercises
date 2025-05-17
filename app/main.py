@@ -36,7 +36,7 @@ async def contacts(req: Request, q: str="", page:int=1):
         contact_set = Contact.all()
     contact_set = Contact.paginate_set(contact_set, page)
 
-    return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set, "page": page, "search_query":q})
+    return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set, "page": page,})
 
 
 # HTMX Search
@@ -49,10 +49,10 @@ async def search_contacts(req: Request, q: Annotated[str, Form()], page:int=1):
         contact_set = Contact.all()
     contact_set = Contact.paginate_set(contact_set, page)
 
-    resp = templates.TemplateResponse(req, "components/rows.html", context={"contacts": contact_set, "page":page, "search_query":q})
+    resp = templates.TemplateResponse(req, "components/rows.html", context={"contacts": contact_set, "page":page,})
     # New URL
-    url = req.url.replace_query_params(page=1, q=q)
-    resp.headers.append("HX-Replace-URL", url.__str__())
+    # url = req.url.replace_query_params(page=1, q=q)
+    # resp.headers.append("HX-Replace-URL", url.__str__())
     return resp
 
 
