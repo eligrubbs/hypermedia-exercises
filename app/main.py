@@ -42,7 +42,6 @@ async def contacts(req: Request, q: str="", page:int=1):
 # HTMX Search
 @app.post("/contacts", response_class=HTMLResponse)
 async def search_contacts(req: Request, q: Annotated[str, Form()], page: Annotated[int, Form()]):
-    print(page)
     search = q
     if search is not None:
         contact_set = Contact.search(search)
@@ -51,9 +50,7 @@ async def search_contacts(req: Request, q: Annotated[str, Form()], page: Annotat
     contact_set = Contact.paginate_set(contact_set, page)
 
     resp = templates.TemplateResponse(req, "components/rows.html", context={"contacts": contact_set, "page":page, "search_query":q})
-    # New URL
-    # url = req.url.replace_query_params(page=1, q=q)
-    # resp.headers.append("HX-Replace-URL", url.__str__())
+
     return resp
 
 
