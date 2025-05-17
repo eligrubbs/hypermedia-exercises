@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from typing import Annotated
 from fastapi import FastAPI, Request, Form
 from fastapi.staticfiles import StaticFiles
@@ -6,7 +7,15 @@ from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
 
 from contact_model import Contact
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Contact.load_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 app.mount("/static", StaticFiles(directory="static/"), "static")
 
@@ -19,27 +28,32 @@ async def index():
 
 
 @app.get("/contacts", response_class=HTMLResponse)
-async def contacts(req: Request):
-    search = req.query_params.get("q")
-    if search is not None:
-        contact_set = Contact.search(search)
-    else:
-        contact_set = Contact.all()
-
-    return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set})
-
-
-# HTMX Search
-@app.post("/contacts", response_class=HTMLResponse)
-async def search_contacts(req: Request, q: Annotated[str, Form()]):
-
+async def contacts(req: Request, q: str="", page:int=1):
     search = q
     if search is not None:
         contact_set = Contact.search(search)
     else:
         contact_set = Contact.all()
+    contact_set = Contact.paginate_set(contact_set, page)
 
-    return templates.TemplateResponse(req, "components/rows.html", context={"contacts": contact_set})
+    return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set, "page": page, "search_query":q})
+
+
+# HTMX Search
+@app.post("/contacts", response_class=HTMLResponse)
+async def search_contacts(req: Request, q: Annotated[str, Form()], page:int=1):
+    search = q
+    if search is not None:
+        contact_set = Contact.search(search)
+    else:
+        contact_set = Contact.all()
+    contact_set = Contact.paginate_set(contact_set, page)
+
+    resp = templates.TemplateResponse(req, "components/rows.html", context={"contacts": contact_set, "page":page, "search_query":q})
+    # New URL
+    url = req.url.replace_query_params(page=1, q=q)
+    resp.headers.append("HX-Replace-URL", url.__str__())
+    return resp
 
 
 @app.get("/contacts/new", response_class=HTMLResponse)
@@ -96,3 +110,4 @@ async def email_validation(c_id: int, email: str):
     c.email = email
     c.validate()
     return c.errors.get('email', '')
+

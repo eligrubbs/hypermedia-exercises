@@ -7,19 +7,20 @@ import json, time
 from typing import Self
 from pydantic import EmailStr, BaseModel
 
+PAGE_SIZE=10
 
 class Contact:
     # Mocks the database connection
     # This is a class variable that all instantiations have access to
     db: dict[int, Self] = {}
 
-    def __init__(self, id_=None, first=None, last=None, phone=None, email=None):
+    def __init__(self, id_=None, first=None, last=None, phone=None, email=None, errors = {}):
         self.id = id_
         self.first = first
         self.last = last
         self.phone = phone
         self.email = email
-        self.errors = {}
+        self.errors = errors
 
 
     def update(self, first, last, phone, email):
@@ -72,6 +73,12 @@ class Contact:
         return list(cls.db.values())
 
     @classmethod
+    def paginate_set(cls, set: list[Self], page: int=1):
+        start = (page-1)*PAGE_SIZE
+        end = (page)*PAGE_SIZE
+        return  set[start:end]
+
+    @classmethod
     def search(cls, text):
         result = []
         for c in cls.db.values():
@@ -104,7 +111,7 @@ class Contact:
             contacts = json.load(contacts_file)
             cls.db.clear()
             for c in contacts:
-                cls.db[c['id']] = Contact(c['id'], c['first'], c['last'], c['phone'], c['email'])
+                cls.db[c['id']] = Contact(c['id'], c['first'], c['last'], c['phone'], c['email'], c['errors'])
 
     @staticmethod
     def save_db():
