@@ -83,8 +83,8 @@ async def edit_contact(req: Request, c_id: int):
         return templates.TemplateResponse(req, "edit.html", context={"contact": c})
 
 
-@app.post("/contacts/{c_id}/delete", response_class=HTMLResponse)
+@app.delete("/contacts/{c_id}", response_class=HTMLResponse)
 async def del_contact(c_id: int):
     c = Contact.find(c_id)
     c.delete()
-    return RedirectResponse("/contacts", 302)
+    return RedirectResponse("/contacts", 303)
