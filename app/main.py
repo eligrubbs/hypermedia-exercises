@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse, FileResponse
 
-from contact_model import Contact
+from contact_model import Contact, Archiver
 
 
 @asynccontextmanager
@@ -36,7 +36,7 @@ async def contacts(req: Request, q: str="", page:int=1):
         contact_set = Contact.all()
     contact_set = Contact.paginate_set(contact_set, page)
 
-    return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set, "page": page, "search_query":q})
+    return templates.TemplateResponse(req, "index.html", context={"contacts": contact_set, "page": page, "search_query":q, "archiver": Archiver()})
 
 
 # HTMX Search
@@ -77,6 +77,29 @@ async def contact_count():
     import asyncio
     await asyncio.sleep(1)
     return f"( {Contact.all().__len__()} total Contacts )"
+
+
+@app.post("/contacts/archive")
+async def save_offline_contacts(req: Request):
+    archiver = Archiver.get()
+    archiver.run()
+    return templates.TemplateResponse("components/archive_ui.html", context={"request": req, "archiver":archiver})
+
+@app.get("/contacts/archive")
+async def get_saving_progress(req: Request):
+    archiver = Archiver.get()
+    return templates.TemplateResponse("components/archive_ui.html", context={"request": req, "archiver":archiver})
+
+
+@app.get("/contacts/archive/file")
+async def get_archive_file(req: Request):
+
+    return FileResponse("contacts.json")
+
+# @app.get("/messages")
+# async def messages_hypermedia(self):
+    
+#     return
 
 
 @app.get("/contacts/{c_id}", response_class=HTMLResponse)
