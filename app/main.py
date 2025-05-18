@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from typing import Annotated
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
@@ -104,10 +104,15 @@ async def edit_contact(req: Request, c_id: int):
 
 
 @app.delete("/contacts/{c_id}", response_class=HTMLResponse)
-async def del_contact(c_id: int):
+async def del_contact(req: Request, c_id: int):
+    trigger = req.headers.get("HX-Trigger", 'WRONG')
+    if trigger not in ['deleteBtn', 'rowDeleteBtn']:
+        raise HTTPException(422, "Error")
     c = Contact.find(c_id)
     c.delete()
-    return RedirectResponse("/contacts", 303)
+    if trigger == 'deleteBtn':
+        return RedirectResponse("/contacts", 303)
+    return HTMLResponse("")
 
 
 @app.get("/contacts/{c_id}/email", response_class=PlainTextResponse)

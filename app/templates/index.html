@@ -29,7 +29,7 @@
     </div>
 
     <form>
-        <table>
+        <table id="contactTable">
             <thead>
                 <tr>
                     <th></th>
@@ -56,7 +56,7 @@
 
     <p>
         <a href="/contacts/new">Add Contact</a>
-        <span hx-get="/contacts/count" hx-trigger="revealed">
+        <span hx-get="/contacts/count" hx-trigger="revealed, tableChanged from:#contactTable">
           <img id="spinner" style="height: 20px"  class="htmx-indicator" src="/static/img/spinning-circles.svg"/>
         </span>
     </p>

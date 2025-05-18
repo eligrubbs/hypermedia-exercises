@@ -60,6 +60,12 @@ td {
 [data-overflow-menu] {
     visibility: hidden;
 }
-    tr:is(:hover, :focus-within) [data-overflow-menu] {
-        visibility: visible;
-    }
+
+tr:is(:hover, :focus-within) [data-overflow-menu] {
+    visibility: visible;
+}
+
+tr.htmx-swapping {
+  opacity: 0;
+  transition: opacity 1s ease-out;
+}
