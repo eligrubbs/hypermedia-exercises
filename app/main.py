@@ -115,6 +115,15 @@ async def del_contact(req: Request, c_id: int):
     return HTMLResponse("")
 
 
+@app.delete("/contacts", response_class=RedirectResponse)
+async def del_many_contacts(req: Request):
+    vals = req._query_params.getlist('selected_contact_ids')
+    for val in vals:
+        c = Contact.find(int(val))
+        c.delete()
+    return RedirectResponse("/contacts", 303)
+
+
 @app.get("/contacts/{c_id}/email", response_class=PlainTextResponse)
 async def email_validation(c_id: int, email: str):
     c = Contact.find(c_id)
